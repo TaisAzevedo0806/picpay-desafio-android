@@ -10,7 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.picpay.desafio.android.framework.network.PicPayService
 import com.picpay.desafio.android.R
-import com.picpay.desafio.android.presentation.user.User
+import com.picpay.desafio.android.business.domain.model.User
 import com.picpay.desafio.android.presentation.user.UserListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
