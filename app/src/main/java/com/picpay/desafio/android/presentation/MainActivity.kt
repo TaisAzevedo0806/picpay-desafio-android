@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.databinding.ActivityMainBinding
+import com.picpay.desafio.android.framework.network.ResultStatus.*
 import com.picpay.desafio.android.presentation.user.UserListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,29 +39,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeStates() {
-        viewModel.users.observe(this) { value ->
-            value?.let {
-                usersAdapter.users = value
+        viewModel.usersResultStatus.observe(this) { resultStatus ->
+            setProgressbarVisibility(resultStatus is Loading)
+
+            if (resultStatus is Error) {
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.error),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
-        viewModel.progressBar.observe(this) { value ->
-            value.let { show ->
-                binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        viewModel.users.observe(this) { users ->
+            users?.let {
+                usersAdapter.users = users
             }
         }
+    }
 
-        viewModel.error.observe(this) { value ->
-            value.let { show ->
-                if (show) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.error),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    viewModel.onErrorShown()
-                }
-            }
-        }
+    private fun setProgressbarVisibility(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 }

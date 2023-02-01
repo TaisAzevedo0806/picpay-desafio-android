@@ -11,7 +11,8 @@ class UsersRepositoryImpl @Inject constructor(
     private val remoteDataSource: UsersRemoteDataSource<MutableList<UserResponse>>
 ) : UsersRepository {
 
-    override suspend fun getUsers(): MutableList<User> = remoteDataSource.getUsers().map {
-        it.toModel()
-    }.toMutableList()
+    override suspend fun getUsers(): MutableList<User> =
+        remoteDataSource.getUsers().map { userResponse ->
+            userResponse.toModel()
+        }.toMutableList()
 }
