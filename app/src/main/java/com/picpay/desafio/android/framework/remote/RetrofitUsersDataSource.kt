@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class RetrofitUsersDataSource @Inject constructor(
     private val service: PicPayService
-) : UsersRemoteDataSource<List<UserResponse>> {
+) : UsersRemoteDataSource<MutableList<UserResponse>> {
 
-    override suspend fun getUsers(): List<UserResponse> = service.getUsers()
+    override suspend fun getUsers(): MutableList<UserResponse> = service.getUsers()
 }

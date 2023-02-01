@@ -1,15 +1,17 @@
 package com.picpay.desafio.android.business.usecase
 
+import com.picpay.desafio.android.business.data.repository.UsersRepository
 import com.picpay.desafio.android.business.domain.model.User
+import javax.inject.Inject
 
 interface GetUsersUseCase {
 
-    operator fun invoke(): List<User>
+    suspend operator fun invoke(): List<User>
 }
 
-class GetUsersUseCaseImpl : GetUsersUseCase {
+class GetUsersUseCaseImpl @Inject constructor(
+    private val repository: UsersRepository
+) : GetUsersUseCase {
 
-    override fun invoke(): List<User> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun invoke(): List<User> = repository.getUsers()
 }

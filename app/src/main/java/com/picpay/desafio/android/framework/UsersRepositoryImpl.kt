@@ -8,10 +8,10 @@ import com.picpay.desafio.android.framework.network.response.toModel
 import javax.inject.Inject
 
 class UsersRepositoryImpl @Inject constructor(
-    private val remoteDataSource: UsersRemoteDataSource<List<UserResponse>>
+    private val remoteDataSource: UsersRemoteDataSource<MutableList<UserResponse>>
 ) : UsersRepository {
 
-    override suspend fun getUsers(): List<User> = remoteDataSource.getUsers().map {
+    override suspend fun getUsers(): MutableList<User> = remoteDataSource.getUsers().map {
         it.toModel()
-    }
+    }.toMutableList()
 }
