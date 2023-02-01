@@ -5,35 +5,30 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.picpay.desafio.android.R
+import com.picpay.desafio.android.databinding.ActivityMainBinding
 import com.picpay.desafio.android.presentation.user.UserListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var rootLayout: NestedScrollView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private val adapter = UserListAdapter()
+    private var _binding: ActivityMainBinding? = null
+    private val binding: ActivityMainBinding get() = _binding!!
 
     private val viewModel: MainViewModel by viewModels()
+    private val adapter = UserListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        rootLayout = findViewById(R.id.rootLayout)
-        recyclerView = findViewById(R.id.recyclerView)
-        progressBar = findViewById(R.id.user_list_progress_bar)
-
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
 
         observeStates()
         viewModel.getUsers()
@@ -47,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.progressBar.observe(this) { value ->
             value.let { show ->
-                progressBar.visibility = if (show) View.VISIBLE else View.GONE
+                binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
             }
         }
 
@@ -55,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             value.let { show ->
                 if (show) {
                     Snackbar.make(
-                        rootLayout,
+                        binding.rootLayout,
                         getString(R.string.error),
                         Snackbar.LENGTH_SHORT
                     ).show()
