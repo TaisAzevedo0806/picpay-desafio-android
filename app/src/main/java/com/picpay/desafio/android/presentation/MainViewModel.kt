@@ -15,9 +15,9 @@ class MainViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase
 ) : ViewModel() {
 
-    private val _snackBar = MutableLiveData(false)
-    val snackBar: LiveData<Boolean>
-        get() = _snackBar
+    private val _error = MutableLiveData(false)
+    val error: LiveData<Boolean>
+        get() = _error
 
     private val _progressBar = MutableLiveData(false)
     val progressBar: LiveData<Boolean>
@@ -33,14 +33,14 @@ class MainViewModel @Inject constructor(
                 _progressBar.value = true
                 _users.value = getUsersUseCase()
             } catch (error: Throwable) {
-                _snackBar.value = true
+                _error.value = true
             } finally {
                 _progressBar.value = false
             }
         }
     }
 
-    fun onSnackBarShown() {
-        _snackBar.value = false
+    fun onErrorShown() {
+        _error.value = false
     }
 }

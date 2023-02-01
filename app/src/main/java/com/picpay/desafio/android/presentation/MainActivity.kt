@@ -2,11 +2,9 @@ package com.picpay.desafio.android.presentation
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.databinding.ActivityMainBinding
 import com.picpay.desafio.android.presentation.user.UserListAdapter
@@ -19,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding get() = _binding!!
 
     private val viewModel: MainViewModel by viewModels()
-    private val adapter = UserListAdapter()
+    private val usersAdapter = UserListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,16 +25,22 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-
+        initUsersAdapter()
         observeStates()
         viewModel.getUsers()
     }
+
+    private fun initUsersAdapter() {
+        with(binding.recyclerView) {
+            adapter = usersAdapter
+            setHasFixedSize(true)
+        }
+    }
+
     private fun observeStates() {
         viewModel.users.observe(this) { value ->
-            value?.let{
-                adapter.users = value
+            value?.let {
+                usersAdapter.users = value
             }
         }
 
@@ -46,15 +50,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.snackBar.observe(this) { value ->
+        viewModel.error.observe(this) { value ->
             value.let { show ->
                 if (show) {
-                    Snackbar.make(
-                        binding.rootLayout,
+                    Toast.makeText(
+                        this@MainActivity,
                         getString(R.string.error),
-                        Snackbar.LENGTH_SHORT
+                        Toast.LENGTH_SHORT
                     ).show()
-                    viewModel.onSnackBarShown()
+                    viewModel.onErrorShown()
                 }
             }
         }
