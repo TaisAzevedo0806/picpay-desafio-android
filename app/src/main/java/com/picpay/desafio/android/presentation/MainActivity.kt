@@ -5,63 +5,63 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.presentation.user.UserListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(R.layout.activity_main) {
+class MainActivity : AppCompatActivity() {
 
+    private lateinit var rootLayout: NestedScrollView
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
-    private lateinit var adapter: UserListAdapter
+    private val adapter = UserListAdapter()
 
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
+
+        rootLayout = findViewById(R.id.rootLayout)
+        recyclerView = findViewById(R.id.recyclerView)
+        progressBar = findViewById(R.id.user_list_progress_bar)
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
         observeStates()
+        viewModel.getUsers()
     }
     private fun observeStates() {
         viewModel.users.observe(this) { value ->
             value?.let{
-                progressBar.visibility = View.GONE
                 adapter.users = value
             }
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
+        viewModel.progressBar.observe(this) { value ->
+            value.let { show ->
+                progressBar.visibility = if (show) View.VISIBLE else View.GONE
+            }
+        }
 
-        recyclerView = findViewById(R.id.recyclerView)
-        progressBar = findViewById(R.id.user_list_progress_bar)
-
-        adapter = UserListAdapter()
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        progressBar.visibility = View.VISIBLE
-        viewModel.getUsers()
-        /*service.getUsers()
-            .enqueue(object : Callback<List<User>> {
-                override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                    val message = getString(R.string.error)
-
-                    progressBar.visibility = View.GONE
-                    recyclerView.visibility = View.GONE
-
-                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT)
-                        .show()
+        viewModel.snackBar.observe(this) { value ->
+            value.let { show ->
+                if (show) {
+                    Snackbar.make(
+                        rootLayout,
+                        getString(R.string.error),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    viewModel.onSnackBarShown()
                 }
-
-                override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                    progressBar.visibility = View.GONE
-
-                    adapter.users = response.body()!!
-                }
-            })*/
+            }
+        }
     }
 }
